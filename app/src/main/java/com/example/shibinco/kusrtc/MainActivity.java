@@ -2,40 +2,73 @@ package com.example.shibinco.kusrtc;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.graphics.Bitmap;
+import android.view.View;
+import android.widget.ProgressBar;
 
 
 public class MainActivity extends AppCompatActivity {
 
+    String ShowOrHideWebViewInitialUse = "show";
     private WebView mWebView;
+    private ProgressBar spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mWebView = (WebView) findViewById(R.id.activity_main_webview);
+        mWebView = (WebView) findViewById(R.id.webView);
+
+        spinner = (ProgressBar)findViewById(R.id.progressBar1);
+        mWebView.setWebViewClient(new CustomWebViewClient());
 
         // Force links and redirects to open in the WebView instead of in a browser
-        mWebView.setWebViewClient(new WebViewClient());
+            // mWebView.setWebViewClient(new WebViewClient());
 
         // Enable Javascript
-        WebSettings webSettings = mWebView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
+            WebSettings webSettings = mWebView.getSettings();
+            webSettings.setJavaScriptEnabled(true);
 
         // Use remote resource
-         mWebView.loadUrl("http://kurtconline.com");
+            mWebView.loadUrl("http://kurtconline.com");
 
         // Stop local links and redirects from opening in browser instead of WebView
-         mWebView.setWebViewClient(new MyAppWebViewClient());
+            // mWebView.setWebViewClient(new MyAppWebViewClient());
 
         // Use local resource
-        // mWebView.loadUrl("file:///android_asset/www/index.html");
+            // mWebView.loadUrl("file:///android_asset/www/index.html");
+    }
+
+
+
+    // This allows for a splash screen
+    //(and hide elements once the page loads)
+    private class CustomWebViewClient extends WebViewClient {
+
+        @Override
+        public void onPageStarted(WebView webview, String url, Bitmap favicon) {
+            // only make it invisible the FIRST time the app is run
+            if (ShowOrHideWebViewInitialUse.equals("show")) {
+                webview.setVisibility(webview.INVISIBLE);
+            }
+        }
+
+        @Override
+        public void onPageFinished(WebView view, String url) {
+
+            ShowOrHideWebViewInitialUse = "hide";
+            spinner.setVisibility(View.GONE);
+
+            view.setVisibility(mWebView.VISIBLE);
+            super.onPageFinished(view, url);
+
+        }
     }
 
     // Prevent the back-button from closing the app
